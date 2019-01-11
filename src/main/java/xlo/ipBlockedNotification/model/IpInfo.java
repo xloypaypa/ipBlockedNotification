@@ -73,6 +73,18 @@ public class IpInfo {
         UP, DOWN, UNKNOWN
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
     public CountStatus getPingStatus() {
         return pingStatus;
     }
