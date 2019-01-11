@@ -75,7 +75,7 @@ public class StatusServiceTest {
     @Test
     public void should_get_need_check_ip() {
         DateTimeUtils.setCurrentMillisFixed(1000);
-        IpStatus ipStatus1 = new IpStatus(this.matchBackToNormal, this.notMatchBlock);
+        IpStatus ipStatus1 = new IpStatus(this.matchBackToNormal, this.notMatchBackToNormal);
         IpStatus ipStatus2 = new IpStatus(this.notMatchBackToNormal, this.notMatchBlock);
         this.statusService.updateStatus(this.ipInfo1, ipStatus1);
         this.statusService.updateStatus(this.ipInfo2, ipStatus2);
