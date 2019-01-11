@@ -1,7 +1,7 @@
 package xlo.ipBlockedNotification.handler;
 
-import sun.net.smtp.SmtpClient;
 import xlo.ipBlockedNotification.model.IpInfo;
+import xlo.ipBlockedNotification.model.IpStatus;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -27,7 +27,7 @@ public class EmailStatusUpdateHandler implements StatusUpdateHandler {
     }
 
     @Override
-    public void handleStatusUpdate(IpInfo ipInfo) throws MessagingException {
+    public void handleStatusUpdate(IpInfo ipInfo, IpStatus ipStatus) throws MessagingException {
         Properties properties = System.getProperties();
         properties.put("mail.transport.protocol", "smtp");
         properties.put("mail.smtp.host", this.host);
@@ -40,7 +40,8 @@ public class EmailStatusUpdateHandler implements StatusUpdateHandler {
         message.setFrom(fromAddress);
         message.setRecipients(Message.RecipientType.TO, toAddress);
         message.setSubject(ipInfo.getHost() + ":" + ipInfo.getPort() + " status update");
-        message.setText("ping: " + ipInfo.getPingStatus().getStatus().toString() + "; connect: " + ipInfo.getConnectStatus().getStatus().toString());
+        message.setText("ping: " + ipStatus.getPingStatus().getStatus().toString() +
+                "\r\nconnect: " + ipStatus.getConnectStatus().getStatus().toString());
         message.setSentDate(new Date());
 
         Transport transport = session.getTransport();

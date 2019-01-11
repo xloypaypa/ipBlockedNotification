@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Objects;
 
 public class IpInfo {
 
@@ -15,11 +16,7 @@ public class IpInfo {
         this.host = host;
         this.port = port;
         this.timeout = timeout;
-        this.pingStatus = new CountStatus();
-        this.connectStatus = new CountStatus();
     }
-
-    private CountStatus pingStatus, connectStatus;
 
     public boolean isReachable() throws IOException {
         return InetAddress.getByName(this.host).isReachable(this.timeout);
@@ -28,49 +25,6 @@ public class IpInfo {
     public boolean isConnectable() throws IOException {
         new Socket().connect(new InetSocketAddress(this.host, this.port), this.timeout);
         return true;
-    }
-
-    public static class CountStatus {
-        private Status status;
-        private int previousStatusCount, currentStatusCount;
-
-        public CountStatus() {
-            this.status = Status.UNKNOWN;
-            this.previousStatusCount = 0;
-            this.currentStatusCount = 0;
-        }
-
-        public CountStatus(Status status, int previousStatusCount, int currentStatusCount) {
-            this.status = status;
-            this.previousStatusCount = previousStatusCount;
-            this.currentStatusCount = currentStatusCount;
-        }
-
-        public void updateStatus(Status status) {
-            if (status.equals(this.status)) {
-                this.currentStatusCount++;
-            } else {
-                this.status = status;
-                this.previousStatusCount = this.currentStatusCount;
-                this.currentStatusCount = 1;
-            }
-        }
-
-        public Status getStatus() {
-            return status;
-        }
-
-        public int getPreviousStatusCount() {
-            return previousStatusCount;
-        }
-
-        public int getCurrentStatusCount() {
-            return currentStatusCount;
-        }
-    }
-
-    public enum Status {
-        UP, DOWN, UNKNOWN
     }
 
     public String getHost() {
@@ -85,11 +39,18 @@ public class IpInfo {
         return timeout;
     }
 
-    public CountStatus getPingStatus() {
-        return pingStatus;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IpInfo ipInfo = (IpInfo) o;
+        return port == ipInfo.port &&
+                timeout == ipInfo.timeout &&
+                host.equals(ipInfo.host);
     }
 
-    public CountStatus getConnectStatus() {
-        return connectStatus;
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port, timeout);
     }
 }

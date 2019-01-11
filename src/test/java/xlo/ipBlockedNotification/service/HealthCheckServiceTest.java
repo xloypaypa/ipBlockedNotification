@@ -9,14 +9,14 @@ import java.io.IOException;
 import static org.mockito.Mockito.*;
 
 public class HealthCheckServiceTest {
-    
-    private IpInfoService ipInfoService;
+
+    private ResultService resultService;
     private HealthCheckService healthCheckService;
 
     @Before
     public void setUp() {
-        this.ipInfoService = mock(IpInfoService.class);
-        this.healthCheckService = new HealthCheckService(ipInfoService);
+        this.resultService = mock(ResultService.class);
+        this.healthCheckService = new HealthCheckService(resultService);
     }
 
     @Test
@@ -27,8 +27,8 @@ public class HealthCheckServiceTest {
 
         this.healthCheckService.checkHealth(ipInfo);
 
-        verify(this.ipInfoService).handlePingSuccess(ipInfo);
-        verify(this.ipInfoService).handleConnectSuccess(ipInfo);
+        verify(this.resultService).handleHealthCheck(same(ipInfo), eq(new HealthCheckService.Result(true, null)),
+                eq(new HealthCheckService.Result(true, null)));
     }
 
     @Test
@@ -39,8 +39,8 @@ public class HealthCheckServiceTest {
 
         this.healthCheckService.checkHealth(ipInfo);
 
-        verify(this.ipInfoService).handlePingSuccess(ipInfo);
-        verify(this.ipInfoService).handleConnectFailed(ipInfo, null);
+        verify(this.resultService).handleHealthCheck(same(ipInfo), eq(new HealthCheckService.Result(true, null)),
+                eq(new HealthCheckService.Result(false, null)));
     }
 
     @Test
@@ -52,8 +52,8 @@ public class HealthCheckServiceTest {
 
         this.healthCheckService.checkHealth(ipInfo);
 
-        verify(this.ipInfoService).handlePingSuccess(ipInfo);
-        verify(this.ipInfoService).handleConnectFailed(ipInfo, ioException);
+        verify(this.resultService).handleHealthCheck(same(ipInfo), eq(new HealthCheckService.Result(true, null)),
+                eq(new HealthCheckService.Result(false, ioException)));
     }
 
     @Test
@@ -64,8 +64,8 @@ public class HealthCheckServiceTest {
 
         this.healthCheckService.checkHealth(ipInfo);
 
-        verify(this.ipInfoService).handlePingFailed(ipInfo, null);
-        verify(this.ipInfoService).handleConnectSuccess(ipInfo);
+        verify(this.resultService).handleHealthCheck(same(ipInfo), eq(new HealthCheckService.Result(false, null)),
+                eq(new HealthCheckService.Result(true, null)));
     }
 
     @Test
@@ -77,8 +77,8 @@ public class HealthCheckServiceTest {
 
         this.healthCheckService.checkHealth(ipInfo);
 
-        verify(this.ipInfoService).handlePingFailed(ipInfo, ioException);
-        verify(this.ipInfoService).handleConnectSuccess(ipInfo);
+        verify(this.resultService).handleHealthCheck(same(ipInfo), eq(new HealthCheckService.Result(false, ioException)),
+                eq(new HealthCheckService.Result(true, null)));
     }
 
 }

@@ -3,43 +3,74 @@ package xlo.ipBlockedNotification.service;
 import xlo.ipBlockedNotification.model.IpInfo;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class HealthCheckService {
 
-    private final IpInfoService ipInfoService;
+    private final ResultService resultService;
 
-    public HealthCheckService(IpInfoService ipInfoService) {
-        this.ipInfoService = ipInfoService;
+    public HealthCheckService(ResultService resultService) {
+        this.resultService = resultService;
     }
 
 
     public void checkHealth(IpInfo ipInfo) {
-        checkReachable(ipInfo);
-        checkConnectable(ipInfo);
+        this.resultService.handleHealthCheck(ipInfo, checkReachable(ipInfo), checkConnectable(ipInfo));
     }
 
-    private void checkConnectable(IpInfo ipInfo) {
+    private Result checkConnectable(IpInfo ipInfo) {
+        boolean ok;
+        Exception exception = null;
         try {
-            if (ipInfo.isConnectable()) {
-                ipInfoService.handleConnectSuccess(ipInfo);
-            } else {
-                ipInfoService.handleConnectFailed(ipInfo, null);
-            }
-
+            ok = ipInfo.isConnectable();
         } catch (IOException e) {
-            ipInfoService.handleConnectFailed(ipInfo, e);
+            ok = false;
+            exception = e;
         }
+        return new Result(ok, exception);
     }
 
-    private void checkReachable(IpInfo ipInfo) {
+    private Result checkReachable(IpInfo ipInfo) {
+        boolean ok;
+        Exception exception = null;
         try {
-            if (ipInfo.isReachable()) {
-                ipInfoService.handlePingSuccess(ipInfo);
-            } else {
-                ipInfoService.handlePingFailed(ipInfo, null);
-            }
+            ok = ipInfo.isReachable();
         } catch (IOException e) {
-            ipInfoService.handlePingFailed(ipInfo, e);
+            ok = false;
+            exception = e;
+        }
+        return new Result(ok, exception);
+    }
+
+    public static class Result {
+        private final boolean ok;
+        private final Exception exception;
+
+        public Result(boolean ok, Exception exception) {
+            this.ok = ok;
+            this.exception = exception;
+        }
+
+        public boolean isOk() {
+            return ok;
+        }
+
+        public Exception getException() {
+            return exception;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Result result = (Result) o;
+            return ok == result.ok &&
+                    Objects.equals(exception, result.exception);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(ok, exception);
         }
     }
 
