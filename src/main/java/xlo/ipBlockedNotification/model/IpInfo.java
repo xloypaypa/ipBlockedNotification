@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class IpInfo {
 
@@ -16,14 +15,11 @@ public class IpInfo {
         this.host = host;
         this.port = port;
         this.timeout = timeout;
-        this.pingStatus = Status.UNKNOWN;
-        this.connectStatus = Status.UNKNOWN;
-        this.successfulTimes = 0;
-        this.failedTimes = 0;
+        this.pingStatus = new CountStatus();
+        this.connectStatus = new CountStatus();
     }
 
-    private Status pingStatus, connectStatus;
-    private int successfulTimes, failedTimes;
+    private CountStatus pingStatus, connectStatus;
 
     public boolean isReachable() throws IOException {
         return InetAddress.getByName(this.host).isReachable(this.timeout);
@@ -34,8 +30,54 @@ public class IpInfo {
         return true;
     }
 
+    public static class CountStatus {
+        private Status status;
+        private int previousStatusCount, currentStatusCount;
+
+        public CountStatus() {
+            this.status = Status.UNKNOWN;
+            this.previousStatusCount = 0;
+            this.currentStatusCount = 0;
+        }
+
+        public CountStatus(Status status, int previousStatusCount, int currentStatusCount) {
+            this.status = status;
+            this.previousStatusCount = previousStatusCount;
+            this.currentStatusCount = currentStatusCount;
+        }
+
+        public void updateStatus(Status status) {
+            if (status.equals(this.status)) {
+                this.currentStatusCount++;
+            } else {
+                this.status = status;
+                this.previousStatusCount = this.currentStatusCount;
+                this.currentStatusCount = 1;
+            }
+        }
+
+        public Status getStatus() {
+            return status;
+        }
+
+        public int getPreviousStatusCount() {
+            return previousStatusCount;
+        }
+
+        public int getCurrentStatusCount() {
+            return currentStatusCount;
+        }
+    }
+
     public enum Status {
         UP, DOWN, UNKNOWN
     }
 
+    public CountStatus getPingStatus() {
+        return pingStatus;
+    }
+
+    public CountStatus getConnectStatus() {
+        return connectStatus;
+    }
 }

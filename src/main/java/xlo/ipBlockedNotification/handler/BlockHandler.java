@@ -1,7 +1,9 @@
 package xlo.ipBlockedNotification.handler;
 
+import xlo.ipBlockedNotification.model.IpInfo;
+
 public interface BlockHandler {
 
-    void handleBlock(String host, int port);
+    void handleBlock(IpInfo ipInfo);
 
 }
