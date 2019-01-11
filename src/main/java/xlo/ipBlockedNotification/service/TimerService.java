@@ -43,6 +43,7 @@ public class TimerService {
 
                     Map<IpInfo, IpStatus> result = statusService.needSendNotification();
                     for (Map.Entry<IpInfo, IpStatus> now : result.entrySet()) {
+                        if (!ipInfos.contains(now.getKey())) continue;
                         for (StatusUpdateHandler statusUpdateHandler : statusUpdateHandlers) {
                             try {
                                 statusUpdateHandler.handleStatusUpdate(now.getKey(), now.getValue());
