@@ -23,7 +23,9 @@ public class IpInfo {
     }
 
     public boolean isConnectable() throws IOException {
-        new Socket().connect(new InetSocketAddress(this.host, this.port), this.timeout);
+        Socket socket = new Socket();
+        socket.connect(new InetSocketAddress(this.host, this.port), this.timeout);
+        socket.close();
         return true;
     }
 

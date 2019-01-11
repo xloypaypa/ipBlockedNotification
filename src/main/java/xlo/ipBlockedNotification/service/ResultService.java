@@ -12,6 +12,8 @@ public class ResultService {
     }
 
     public void handleHealthCheck(IpInfo ipInfo, HealthCheckService.Result pingResult, HealthCheckService.Result connectResult) {
+        System.out.println(ipInfo.getHost() + " " + pingResult.isOk() + " " + connectResult.isOk());
+
         IpStatus previousStatus = this.statusService.getStatus(ipInfo);
         IpStatus.Status nextPingStatus = pingResult.isOk() ? IpStatus.Status.UP : IpStatus.Status.DOWN;
         IpStatus.Status nextConnectStatus = connectResult.isOk() ? IpStatus.Status.UP : IpStatus.Status.DOWN;
